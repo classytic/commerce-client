@@ -1,0 +1,8 @@
+import { defineConfig } from 'tsdown';
+
+export default defineConfig({
+  entry: ['src/index.ts', 'src/types.ts', 'src/management.ts', 'src/management-types.ts', 'src/delivery-types.ts', 'src/category-tree.ts'],
+  format: 'esm', dts: true, clean: true, publint: true,
+  outExtensions: () => ({ js: '.js', dts: '.d.ts' }),
+  deps: { neverBundle: true, onlyBundle: [] },
+});
