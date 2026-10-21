@@ -75,6 +75,11 @@ export interface StoreSettings {
 }
 export interface MerchantMedia {
   _id: string;
+  folder: string;
+  size: number;
+  title?: string;
+  alt?: string;
+  createdAt?: string;
   url: string;
   filename: string;
   mimeType?: string;

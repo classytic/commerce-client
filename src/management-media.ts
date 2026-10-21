@@ -42,10 +42,12 @@ export function createMerchantMedia(client: ArcClient, fetcher?: ArcClientConfig
   }
   return {
     list: media.getAll.bind(media),
+    remove: media.delete.bind(media),
     upload: (file: File, folder: 'products' | 'categories' = 'products') => upload(file, folder),
     async uploadImage(file: File, folder: 'products' | 'categories' = 'products'): Promise<MerchantMedia> {
       const policy = await media.request<MediaTransformPolicy>('GET', `${media.baseUrl}/transform-policy`);
-      const { resolveTransformPlan } = await import('@classytic/media-transform/policy');
+      const { resolveTransformPlan, isTransformableImage } = await import('@classytic/media-transform/policy');
+      if (!isTransformableImage(file.type)) throw new Error('Choose a JPEG, PNG, WebP, AVIF or BMP image that your browser can open.');
       const plan = resolveTransformPlan({ folder, mimeType: file.type, bytes: file.size }, policy);
       if (!plan.transform) {
         if (plan.outcome === 'preserve') return upload(file, folder);
@@ -56,7 +58,10 @@ export function createMerchantMedia(client: ArcClient, fetcher?: ArcClientConfig
         import('@classytic/media-transform/image/compressImageSet'),
         import('@classytic/media-transform/image/uploadHints'),
       ]);
-      const result = await compressImageSet(await createBrowserImageAdapter(), file, plan.options);
+      const adapter = await createBrowserImageAdapter();
+      const result = await compressImageSet(adapter, file, plan.options).catch(() => {
+        throw new Error('Your browser could not process this image. Try a JPEG or PNG copy.');
+      });
       const output = new File([result.blob], storedFilename(file.name, result.format), { type: result.blob.type });
       return upload(output, folder, result, file.name);
     },

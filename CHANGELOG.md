@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.1 — 2026-10-20
+
+Add tenant-scoped media removal through the guarded media resource, and type media folder, size and display metadata for Fluid library bindings. Report unsupported source formats and browser decoding failures before starting storage writes.
+
+Add `@classytic/commerce-client/platform`: `createPlatformClient({ apiUrl, token })` for platform administration with a bearer token and no merchant organization. `organizations.list` pages organizations and `organizations.decide(id, { action, expectedStatus, note })` applies an approve, reject, suspend or reactivate decision (matches `@spinekit/auth` 0.17.0 `./organizations`).
+
+Dependencies are already at the latest published (`arc-next` 0.18.0, `media-transform` 0.3.0, `primitives` 0.34.0).
+
 ## 0.1.0 — 2026-10-20
 
 First publish.
@@ -19,3 +27,5 @@ Typed store profiles, catalog reads, guest checkout with explicit retry keys, an
 The isolated `/management` entry supports merchant catalog/media, order commands
 and cash collection, store settings, Telegram connections and delivery history,
 plus API-key options, creation, rotation and revocation.
+
+Platform administration: `./platform` exposes bearer-only organization lists and guarded status decisions without requiring a merchant organization.

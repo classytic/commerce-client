@@ -32,3 +32,14 @@ it('refuses unknown transform policies before starting an upload', async () => {
   await expect(client.media.uploadImage(new File(['png'], 'photo.png', { type: 'image/png' }))).rejects.toThrow('unsupported');
   expect(fetch).toHaveBeenCalledTimes(1);
 });
+
+it('deletes media under the captured tenant and preserves an in-use refusal', async () => {
+  const fetch = vi.fn(async (_url: string, _init: RequestInit) => Response.json({ code: 'media.in_use', message: 'This image is used by a live product.' }, { status: 409 }));
+  const client = createMerchantClient({ apiUrl: 'https://api.test/api/v1', token: 'secret', organizationId: 'store-a', fetch });
+  await expect(client.media.remove({ id: 'media-1' })).rejects.toMatchObject({ status: 409 });
+  const [url, init] = fetch.mock.calls[0]!;
+  expect(String(url)).toBe('https://api.test/api/v1/media/media-1');
+  expect(init.method).toBe('DELETE');
+  expect(new Headers(init.headers).get('x-organization-id')).toBe('store-a');
+  expect(new Headers(init.headers).get('authorization')).toBe('Bearer secret');
+});

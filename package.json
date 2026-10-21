@@ -1,6 +1,6 @@
 {
   "name": "@classytic/commerce-client",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Typed storefront and merchant clients for the Classytic Commerce API",
   "type": "module",
   "sideEffects": false,
@@ -30,6 +30,10 @@
     "./category-tree": {
       "types": "./dist/category-tree.d.ts",
       "default": "./dist/category-tree.js"
+    },
+    "./platform": {
+      "types": "./dist/platform.d.ts",
+      "default": "./dist/platform.js"
     }
   },
   "files": [

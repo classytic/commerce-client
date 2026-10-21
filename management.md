@@ -86,3 +86,15 @@ Product writes also accept `tags`, `collections` and
 `defaultMonetization.pricing.compareAtPrice`. The catalog derives `onSale`; clients
 never set it. Tags and collections use the existing catalog arrays, with no
 additional collection-management service.
+
+
+### Media library
+
+`client.media.list({ params: { page: 1, limit: 20, folder: 'products' } })`
+returns tenant-scoped media and pagination. `client.media.remove({ id })` uses
+the media resource's guarded delete; an in-use image is refused by the server.
+
+`client.media.uploadImage(file, folder)` resolves the server's transform policy
+through media-transform before requesting storage writes. The server must accept
+every output format in its policy, including the browser encoder's fallback.
+Passthrough thresholds and dimensions belong to that policy, rather than the UI.
