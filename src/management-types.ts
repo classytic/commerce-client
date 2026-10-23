@@ -53,6 +53,23 @@ export interface MerchantCategoryTree extends MerchantCategory {
   children: MerchantCategoryTree[];
   totalProductCount: number;
 }
+export interface CollectionInput {
+  name: string;
+  /** Omit to derive from the name. Permanent after creation. */
+  slug?: string;
+  description?: string;
+  image?: { url: string; alt?: string } | null;
+  isActive?: boolean;
+  featured?: boolean;
+  displayOrder?: number;
+}
+export type CollectionUpdate = Partial<Omit<CollectionInput, 'slug'>>;
+export interface MerchantCollection extends CollectionInput {
+  _id: string;
+  /** Pass the version read by the editor to collections.update({ version }). */
+  __v: number;
+  slug: string;
+}
 export interface MerchantOrder extends StorefrontOrder {
   _id: string;
   customerSnapshot?: { name: string; phone?: string; email?: string };

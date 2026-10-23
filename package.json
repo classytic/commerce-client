@@ -1,6 +1,6 @@
 {
   "name": "@classytic/commerce-client",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Typed storefront and merchant clients for the Classytic Commerce API",
   "type": "module",
   "sideEffects": false,
@@ -63,7 +63,7 @@
     "esbuild": "^0.28.1",
     "publint": "^0.3.25",
     "tsdown": "^0.23.1",
-    "typescript": "^7.0.2",
+    "typescript": "^7.1.0-beta",
     "vitest": "^5.0.5"
   },
   "publishConfig": {

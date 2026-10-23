@@ -2,6 +2,7 @@ import type { DeliveryArea, DeliveryDistrict, DeliveryQuote, DeliveryQuoteInput 
 import { BaseApi } from '@classytic/arc-next/api';
 import { createClient, type ArcClientConfig } from '@classytic/arc-next/client';
 import type {
+  StorefrontCollection, StorefrontCollectionQuery, StorefrontCollectionPage,
   GuestCheckoutInput, GuestCheckoutOptions, GuestCheckoutResult, GuestOrderAccess,
   StorefrontCategory, StorefrontOrder, StorefrontProduct, StorefrontProductPage,
   StorefrontProductQuery, StorefrontProfile, StorefrontRequestOptions,
@@ -48,6 +49,12 @@ export function createStorefrontClient(options: StorefrontClientOptions) {
     ),
     product: (slug: string, request: StorefrontRequestOptions = {}) => catalog.request<StorefrontProduct>(
       'GET', `${catalog.baseUrl}/products/${segment(slug)}`, { options: request },
+    ),
+    collections: (query: StorefrontCollectionQuery = {}, request: StorefrontRequestOptions = {}) => catalog.request<StorefrontCollectionPage>(
+      'GET', `${catalog.baseUrl}/collections`, { params: { ...query }, options: request },
+    ),
+    collection: (slug: string, request: StorefrontRequestOptions = {}) => catalog.request<StorefrontCollection>(
+      'GET', `${catalog.baseUrl}/collections/${segment(slug)}`, { options: request },
     ),
     categories: async (request: StorefrontRequestOptions = {}) => {
       const result = await catalog.request<{ data: StorefrontCategory[] }>('GET', `${catalog.baseUrl}/categories`, { options: request });

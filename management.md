@@ -98,3 +98,32 @@ the media resource's guarded delete; an in-use image is refused by the server.
 through media-transform before requesting storage writes. The server must accept
 every output format in its policy, including the browser encoder's fallback.
 Passthrough thresholds and dimensions belong to that policy, rather than the UI.
+
+## Managed collections
+
+```ts
+const collection = await merchant.collections.create({ data: {
+  name: 'Eid picks', // slug is generated when omitted
+  description: 'Pieces for the celebrations.',
+  isActive: true,
+  featured: true,
+  displayOrder: 10,
+} });
+await merchant.products.update({ id: productId, data: {
+  collections: [collection.slug], // replaces this product's memberships
+} });
+await merchant.collections.update({ id: collection._id, data: {
+  name: 'Our Eid edit', // preserves its permanent slug
+} });
+```
+
+Collections use the same store-bound bearer client and Arc Next CRUD/pagination
+contract as products. Create a new client when switching stores. Slug uniqueness
+is per store. An unknown or foreign collection cannot be assigned. A collection
+cannot be deleted until products release its slug; hide it instead when keeping
+memberships. Upload cover images with `merchant.media.uploadImage(file,
+'collections')` and pass `{ url, alt }` as `image`.
+
+Existing string labels require the Brihot server's `collections:migrate` script
+before switching an existing storefront to managed collection navigation. It is a
+per-store dry run by default; it creates metadata without rewriting memberships.

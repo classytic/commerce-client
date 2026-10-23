@@ -27,6 +27,22 @@ export interface StorefrontCategory {
   image?: { url: string; alt?: string } | null;
   displayOrder?: number;
 }
+export interface StorefrontCollection {
+  id: string;
+  slug: string;
+  name: string;
+  description?: string;
+  image?: { url: string; alt?: string } | null;
+  featured: boolean;
+  displayOrder: number;
+}
+export interface StorefrontCollectionQuery {
+  limit?: number;
+  /** Opaque cursor; retain the same featured filter between pages. */
+  after?: string;
+  featured?: boolean;
+}
+export interface StorefrontCollectionPage { data: StorefrontCollection[]; next: string | null }
 export interface StorefrontProductPage { data: StorefrontProduct[]; next: string | null }
 export interface StorefrontProductQuery {
   limit?: number;

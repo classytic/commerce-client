@@ -4,6 +4,9 @@ import { createMerchantDelivery } from './management-delivery.js';
 import { createMerchantAccess } from './management-access.js';
 import { createMerchantMedia } from './management-media.js';
 import type {
+  CollectionInput,
+  CollectionUpdate,
+  MerchantCollection,
   AnalyticsWindow,
   MerchantOverview,
   CategoryInput,
@@ -70,6 +73,7 @@ export function createMerchantClient(options: MerchantClientOptions) {
     ...createMerchantAccess(client),
     ...createMerchantDelivery(client),
     products,
+    collections: new BaseApi<MerchantCollection, CollectionInput, CollectionUpdate>('collections', config),
     categories: Object.assign(categories, {
       tree: (options: { signal?: AbortSignal } = {}) => categories.request<MerchantCategoryTree[]>(
         'GET', `${categories.baseUrl}/tree`, { options },

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.0 — 2026-10-23
+
+Add typed merchant collection CRUD and public collection list/detail methods with
+cursor pagination over Arc Next. Add the collections media folder. Browser
+entry points remain independent of React, MongoDB and server domain packages.
+
+Dependencies are already at the latest published (`arc-next` 0.18.0, `media-transform` 0.3.0, `primitives` 0.34.0). Dev toolchain: `typescript@7.1.0-beta`, which tsdown 0.23.2 needs to emit declarations with TypeScript 7.
+
 ## 0.1.1 — 2026-10-20
 
 Add tenant-scoped media removal through the guarded media resource, and type media folder, size and display metadata for Fluid library bindings. Report unsupported source formats and browser decoding failures before starting storage writes.

@@ -7,7 +7,7 @@ vi.mock('@classytic/media-transform/image/compressImageSet', () => ({ compressIm
   derivatives: [{ name: 'medium', blob: new Blob(['medium'], { type: 'image/webp' }), format: 'webp', width: 800, height: 800, bytes: 6 }], skipped: [],
 }) }));
 
-it.each(['products', 'categories'] as const)('uploads policy-derived WebP sizes to %s without forwarding merchant credentials to storage', async folder => {
+it.each(['products', 'categories', 'collections'] as const)('uploads policy-derived WebP sizes to %s without forwarding merchant credentials to storage', async folder => {
   const fetch = vi.fn(async (_url: string, _init: RequestInit) => Response.json({}));
   fetch.mockResolvedValueOnce(Response.json({ version: 1, rules: [], fallback: { preset: 'ecom', derivatives: [{ name: 'medium', maxEdge: 800 }] } }));
   fetch.mockResolvedValueOnce(Response.json({ kind: 'presigned', upload: { key: 'a/photo.webp', uploadUrl: 'https://storage.test/primary' }, derivativeUploads: [{ name: 'medium', upload: { key: 'a/photo__medium.webp', uploadUrl: 'https://storage.test/medium' } }] }));

@@ -128,3 +128,45 @@ and sort. Restart pagination when filters change. Public calls always enforce th
 resolved store and published/priced visibility, and reject unknown query fields.
 Merchant `products.getAll({ params })` continues to use Arc's normal allowed query
 syntax, including tags, collections and base-price bracket filters.
+
+### Managed collections
+
+A collection is a store-owned merchandising group, independent of the category
+hierarchy. Enable `modules: { collections: true }` on the catalog engine and mount
+`createStorefrontCollectionResource` from `@spinekit/catalog/collections-storefront`.
+Disabled engines register no collection model or indexes. The SDK stays browser-safe
+and does not import catalog, MongoDB, React or the server modules.
+
+```ts
+const groups = await storefront.collections({ featured: true, limit: 8 });
+const collection = await storefront.collection('eid-picks');
+const products = await storefront.products({
+  collection: collection.slug,
+  category: 'children', // optional; intersects the collection
+  tag: 'cotton',        // optional
+  sort: 'newest',
+  limit: 20,
+});
+// Pass groups.next / products.next as `after`, retaining the same filters.
+```
+
+Only visible collections are public. Hidden or missing collection filters return
+404. `featured` and `displayOrder` are editorial settings, not sales rankings.
+A collection does not belong to a category: its products can span categories, or a
+frontend can intersect both filters. Storefront sections and page layout stay in
+the frontend.
+
+Merchant collection edits use the version returned by the management API:
+
+```ts
+await merchant.collections.update({
+  id: collection._id,
+  data: { name: 'Summer favourites' },
+  version: collection.__v,
+});
+```
+
+Arc Next sends `If-Match` for this version. A 412 response means another editor
+changed the collection: reload and review the latest record before saving again.
+Keep the original version with an open draft; do not silently retry with a newer
+version.
