@@ -170,3 +170,5 @@ Arc Next sends `If-Match` for this version. A 412 response means another editor
 changed the collection: reload and review the latest record before saving again.
 Keep the original version with an open draft; do not silently retry with a newer
 version.
+
+Quantity inventory is documented in [management.md](management.md#stock).

@@ -212,3 +212,24 @@ it('summarizes status order values without claiming delivered or collected payme
   expect(empty.summary.averageOrderValue).toBe(0);
   expect(empty.statuses).toEqual([]);
 });
+
+it('scopes quantity commands and preserves the stock retry key', async () => {
+  const fetch = vi.fn(async (_url: string, _init: RequestInit) => Response.json({ data: [] }));
+  const client = createMerchantClient({ apiUrl: 'https://api.test/api/v1', token: 'stock-token', organizationId: 'store-a', fetch });
+  const id = '6adb3db1d42a29114bdc4209';
+  await client.stock.read(id);
+  await client.stock.query([id]);
+  const data = { variantSku: 'SHIRT-M', quantity: 8, expectedQuantity: 5 };
+  await client.stock.setQuantity(id, data, 'quantity-command');
+  await client.stock.setQuantity(id, data, 'quantity-command');
+  for (const [, init] of fetch.mock.calls) {
+    expect(new Headers(init.headers).get('authorization')).toBe('Bearer stock-token');
+    expect(new Headers(init.headers).get('x-organization-id')).toBe('store-a');
+  }
+  for (const [url, init] of fetch.mock.calls.slice(2)) {
+    expect(url).toBe(`https://api.test/api/v1/inventory/products/${id}/action`);
+    expect(new Headers(init.headers).get('idempotency-key')).toBe('quantity-command');
+    expect(JSON.parse(String(init.body))).toEqual({ ...data, action: 'set_quantity' });
+  }
+  expect(() => client.stock.setQuantity(id, data, '')).toThrow('idempotency');
+});

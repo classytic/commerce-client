@@ -3,6 +3,7 @@ import type { Address } from '@classytic/primitives/address';
 import type { StorefrontOrder, StorefrontProduct } from './types.js';
 
 export interface ProductInput {
+  inventory?: { stockTracked: boolean };
   name: string;
   slug: string;
   productType: 'physical';
@@ -29,6 +30,7 @@ export interface ProductInput {
   }>;
 }
 export interface MerchantProduct extends ProductInput {
+  stock?: ProductStock;
   _id: string;
   updatedAt: string;
 }
@@ -194,4 +196,15 @@ export interface MerchantOverview {
     averageOrderValue: number;
   };
   statuses: Array<{ status: string; count: number; orderValue: number }>;
+}
+
+export interface ProductStock {
+  productId: string;
+  tracked: boolean;
+  items: Array<{ variantSku?: string; attributes: Record<string, string>; quantity: number }>;
+}
+export interface StockCountInput {
+  variantSku?: string;
+  quantity: number;
+  expectedQuantity: number;
 }

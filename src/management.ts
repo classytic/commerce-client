@@ -1,5 +1,6 @@
 import { BaseApi } from '@classytic/arc-next/api';
 import { createClient, type ArcClientConfig } from '@classytic/arc-next/client';
+import { createMerchantStock } from './management-stock.js';
 import { createMerchantDelivery } from './management-delivery.js';
 import { createMerchantAccess } from './management-access.js';
 import { createMerchantMedia } from './management-media.js';
@@ -71,6 +72,7 @@ export function createMerchantClient(options: MerchantClientOptions) {
   const stores = new BaseApi('stores', config);
   return {
     ...createMerchantAccess(client),
+    ...createMerchantStock(client),
     ...createMerchantDelivery(client),
     products,
     collections: new BaseApi<MerchantCollection, CollectionInput, CollectionUpdate>('collections', config),

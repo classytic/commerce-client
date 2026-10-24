@@ -3,6 +3,7 @@ import type { Money } from '@classytic/primitives/money';
 
 /** Public wire projections; merchant-only catalog and buyer fields are absent. */
 export interface StorefrontProduct {
+  stock?: { tracked: boolean; quantity?: number; variants?: Array<{ sku?: string; quantity: number }> };
   id: string;
   name: string;
   slug: string;

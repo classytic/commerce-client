@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.0 — 2026-10-24
+
+Add merchant `stock.read`, batched `stock.query` and guarded `stock.setQuantity` over Arc Next, product stock-tracking input and public per-variant availability types. Count retries require an explicit stable key. Browser bundles remain independent of server kernels.
+
 ## 0.2.0 — 2026-10-23
 
 Add typed merchant collection CRUD and public collection list/detail methods with

@@ -127,3 +127,31 @@ memberships. Upload cover images with `merchant.media.uploadImage(file,
 Existing string labels require the Brihot server's `collections:migrate` script
 before switching an existing storefront to managed collection navigation. It is a
 per-store dry run by default; it creates metadata without rewriting memberships.
+
+## Stock
+
+Brihot uses available quantities per product/variant. New products default to
+tracked; existing products keep their saved setting. Untracked products have no
+quantity limit. Set counts before enabling tracking on an existing product.
+
+```ts
+const stock = await merchant.stock.read(productId);
+const item = stock.items[0];
+await merchant.stock.setQuantity(productId, {
+  variantSku: item.variantSku, // omit for a simple product
+  quantity: 12,
+  expectedQuantity: item.quantity,
+}, crypto.randomUUID()); // create once; reuse on a transport retry
+await merchant.products.update({ id: productId, data: {
+  inventory: { stockTracked: true },
+} });
+```
+
+Use `stock.query(productIds)` for a table page (maximum 50 products), rather than
+one request per row. A stale count returns 409; reload before submitting a new
+count. Checkout deducts atomically and refuses insufficient stock. Canceling an
+unshipped order restores its quantity once; shipping does not deduct again.
+
+Storefront products optionally expose `stock: { tracked, quantity, variants }`.
+Use a selected variant's quantity, disable sold-out options and cap the quantity
+input. These values inform the UI; checkout always validates current stock.
