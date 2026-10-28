@@ -22,7 +22,10 @@ export interface ProductInput {
     name: string;
     values: Array<{ code: string; label: string }>;
   }>;
+  variantExclusions?: Array<Record<string, string>>;
   variants?: Array<{
+    /** Existing server-owned stock identity; preserve when editing a variant. */
+    skuRef?: string;
     sku: string;
     attributes: Record<string, string>;
     priceModifier: number;
@@ -41,6 +44,7 @@ export interface CategoryInput {
   parent?: string | null;
   description?: string;
   image?: { url: string; alt?: string } | null;
+  bannerImage?: { url: string; alt?: string } | null;
   isActive?: boolean;
   displayOrder?: number;
 }
@@ -207,4 +211,14 @@ export interface StockCountInput {
   variantSku?: string;
   quantity: number;
   expectedQuantity: number;
+}
+export type StoreMode = 'products' | 'bookings' | 'both';
+export interface StoreCapabilities {
+  mode: StoreMode;
+  available: { products: boolean; bookings: boolean };
+  version: number | null;
+}
+export interface StoreCapabilitiesUpdate {
+  mode: StoreMode;
+  expectedVersion: number | null;
 }

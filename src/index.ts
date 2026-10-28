@@ -1,6 +1,7 @@
 import type { DeliveryArea, DeliveryDistrict, DeliveryQuote, DeliveryQuoteInput } from './delivery-types.js';
 import { BaseApi } from '@classytic/arc-next/api';
 import { createClient, type ArcClientConfig } from '@classytic/arc-next/client';
+import { createStorefrontBookings } from './bookings.js';
 import type {
   StorefrontCollection, StorefrontCollectionQuery, StorefrontCollectionPage,
   GuestCheckoutInput, GuestCheckoutOptions, GuestCheckoutResult, GuestOrderAccess,
@@ -41,6 +42,7 @@ export function createStorefrontClient(options: StorefrontClientOptions) {
   const catalog = new BaseApi(`storefront/${segment(store)}`, config);
   const profiles = new BaseApi('stores', config);
   return {
+    bookings: createStorefrontBookings(catalog),
     profile: (request: StorefrontRequestOptions = {}) => profiles.request<StorefrontProfile>(
       'GET', `${profiles.baseUrl}/${segment(store)}`, { options: request },
     ),

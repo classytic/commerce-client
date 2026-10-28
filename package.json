@@ -1,6 +1,6 @@
 {
   "name": "@classytic/commerce-client",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Typed storefront and merchant clients for the Classytic Commerce API",
   "type": "module",
   "sideEffects": false,
@@ -34,6 +34,18 @@
     "./platform": {
       "types": "./dist/platform.d.ts",
       "default": "./dist/platform.js"
+    },
+    "./booking-types": {
+      "types": "./dist/booking-types.d.ts",
+      "default": "./dist/booking-types.js"
+    },
+    "./content": {
+      "types": "./dist/content.d.ts",
+      "default": "./dist/content.js"
+    },
+    "./merchant-bookings": {
+      "types": "./dist/merchant-bookings.d.ts",
+      "default": "./dist/merchant-bookings.js"
     }
   },
   "files": [
@@ -41,7 +53,9 @@
     "README.md",
     "CHANGELOG.md",
     "LICENSE",
-    "management.md"
+    "management.md",
+    "content.md",
+    "booking.md"
   ],
   "scripts": {
     "build": "tsdown",
@@ -54,17 +68,17 @@
   },
   "dependencies": {
     "@classytic/arc-next": "^0.18.0",
-    "@classytic/media-transform": "^0.3.0",
-    "@classytic/primitives": "^0.34.0"
+    "@classytic/media-transform": "^0.3.0"
   },
   "devDependencies": {
     "@classytic/dev-tools": "^0.2.1",
     "@types/node": "^26.6.5",
-    "esbuild": "^0.28.1",
+    "esbuild": "^0.28.2",
     "publint": "^0.3.25",
-    "tsdown": "^0.23.1",
-    "typescript": "7.1.0-beta",
-    "vitest": "^5.0.5"
+    "tsdown": "^0.23.3",
+    "typescript": "~7.0.2",
+    "vitest": "^5.0.5",
+    "@classytic/primitives": "^0.35.0"
   },
   "publishConfig": {
     "access": "public"
@@ -77,5 +91,8 @@
   "bugs": {
     "url": "https://github.com/classytic/commerce-client/issues"
   },
-  "homepage": "https://github.com/classytic/commerce-client#readme"
+  "homepage": "https://github.com/classytic/commerce-client#readme",
+  "peerDependencies": {
+    "@classytic/primitives": ">=0.35.0"
+  }
 }

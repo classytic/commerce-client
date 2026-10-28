@@ -6,8 +6,9 @@ compose those resources, as Classytic Commerce does; the ERP's older checkout en
 a different contract.
 
 Install with `npm install @classytic/commerce-client`.
+The client shares the app’s `@classytic/primitives >=0.35.0` peer for Money types.
 
-Use Arc Next 0.17 or later. This entry uses its server-safe client/API subpaths;
+Use Arc Next 0.18 or later. This entry uses its server-safe client/API subpaths;
 it imports no React hooks, Next.js APIs, merchant credentials or server kernels.
 
 ```ts
@@ -106,8 +107,10 @@ country when known so the preview applies the same country restriction as checko
 
 `/category-tree` exports framework-independent `categoryNavigation` and
 `categoryChoices` helpers. Public categories include `parent`, `parentPath`,
-`description`, `image` and `displayOrder`; navigation omits children whose parents
+`description`, `image`, optional `bannerImage` and `displayOrder`; navigation omits children whose parents
 are absent from the public category list.
+`image` is for cards/navigation; `bannerImage: { url, alt? }` is for a category page.
+Merchant category create/update accepts `bannerImage`; send `null` to remove it.
 
 ## Storefront product filters
 
@@ -172,3 +175,11 @@ Keep the original version with an open draft; do not silently retry with a newer
 version.
 
 Quantity inventory is documented in [management.md](management.md#stock).
+
+## Optional structured content
+
+Use the separate [`/content` entry](content.md) for published storefront sections
+and scoped merchant editing. Drafts, publishing and trusted templates require the
+optional CMS module in the API.
+
+Optional booking management and storefront examples: [booking guide](booking.md).

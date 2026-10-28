@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.4.0 — 2026-10-29
+
+### Booking management
+
+- ⚠ `@classytic/primitives` is now a REQUIRED peer (`>=0.35.0`) instead of a bundled dependency, so Money types keep one identity across clients and apps. Install it in the host.
+- Dev toolchain: TypeScript `~7.0.2` with tsdown `^0.23.3` (no beta compiler or overrides needed any more).
+
+- Add optional `./merchant-bookings` entry for scoped service, resource schedule and server-permitted booking operations.
+- Document the pay-at-venue storefront and merchant contracts in `booking.md`.
+
+
+### Content
+
+- Add merchant content.refresh(id) for explicitly refreshing a configured storefront cache.
+
+Add typed `page(slug)` reads for embedded page sections and explicit Next cache
+options, with a store-specific tag and bounded default revalidation.
+
+Add optional `/content` clients for tenant-scoped draft editing and versioned
+publication, and credential-free published content reads.
+
+Add optional nullable `bannerImage` to merchant and storefront categories.
+
+Preserve merchant variant `skuRef` on edits and expose exact `variantExclusions`
+for deletion without regeneration. Disabling remains a separate reversible edit.
+
+Add scoped `client.capabilities.read/update` with typed deployment availability,
+store modes and versioned writes. Keep server configuration dependencies outside
+browser entry points.
+
 ## 0.3.0 — 2026-10-24
 
 Add merchant `stock.read`, batched `stock.query` and guarded `stock.setQuantity` over Arc Next, product stock-tracking input and public per-variant availability types. Count retries require an explicit stable key. Browser bundles remain independent of server kernels.

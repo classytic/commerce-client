@@ -17,6 +17,12 @@ if (
     'Run SDK sync from a consumer application that declares this package.',
   );
 const consumer = resolve(app, 'node_modules', manifest.name);
+// The candidate uses the app's primitives peer, including its nominal Money types.
+const testedPrimitives = JSON.parse(await readFile(resolve(source, 'node_modules/@classytic/primitives/package.json'), 'utf8'));
+const appPrimitives = JSON.parse(await readFile(resolve(app, 'node_modules/@classytic/primitives/package.json'), 'utf8'));
+if (appPrimitives.version !== testedPrimitives.version)
+  throw new Error(`Install @classytic/primitives@${testedPrimitives.version} in this consumer before syncing the SDK.`);
+
 async function files(path) {
   const entries = await readdir(path, { withFileTypes: true });
   return (
@@ -40,10 +46,12 @@ const latest = async (paths) =>
   );
 if ((await latest(sourceFiles)) > (await latest(builtFiles)))
   throw new Error('SDK dist is older than source; rebuild first.');
+await rm(resolve(consumer, 'node_modules/@classytic/primitives'), { recursive: true, force: true });
 await rm(resolve(consumer, 'dist'), { recursive: true, force: true });
 await cp(resolve(source, 'dist'), resolve(consumer, 'dist'), {
   recursive: true,
 });
+await rm(resolve(consumer, 'package.json'), { force: true });
 await cp(resolve(source, 'package.json'), resolve(consumer, 'package.json'));
 for (const file of builtFiles) {
   const relative = file.slice(resolve(source, 'dist').length + 1);

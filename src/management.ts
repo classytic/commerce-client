@@ -1,6 +1,8 @@
 import { BaseApi } from '@classytic/arc-next/api';
-import { createClient, type ArcClientConfig } from '@classytic/arc-next/client';
+import { createMerchantTransport, type MerchantClientOptions } from './merchant-transport.js';
+export type { MerchantClientOptions } from './merchant-transport.js';
 import { createMerchantStock } from './management-stock.js';
+import { createMerchantCapabilities } from './management-capabilities.js';
 import { createMerchantDelivery } from './management-delivery.js';
 import { createMerchantAccess } from './management-access.js';
 import { createMerchantMedia } from './management-media.js';
@@ -21,13 +23,6 @@ import type {
   StoreSettings,
 } from './management-types.js';
 
-export interface MerchantClientOptions {
-  apiUrl: string;
-  token: string;
-  organizationId: string;
-  fetch?: ArcClientConfig['fetch'];
-}
-
 function orderKey(value: string): string {
   if (!value || value === '.' || value === '..')
     throw new Error('An order number is required.');
@@ -36,27 +31,7 @@ function orderKey(value: string): string {
 
 /** Capture one authenticated store; callers create a new instance when switching stores. */
 export function createMerchantClient(options: MerchantClientOptions) {
-  const { token, organizationId, fetch: fetcher } = options;
-  const url = new URL(options.apiUrl);
-  if (
-    !['http:', 'https:'].includes(url.protocol) ||
-    url.username ||
-    url.password ||
-    url.search ||
-    url.hash
-  )
-    throw new Error('A valid HTTP(S) API mount is required.');
-  if (!token.trim() || !organizationId.trim())
-    throw new Error('A bearer token and organizationId are required.');
-  const client = createClient({
-    baseUrl: url.href.replace(/\/+$/, ''),
-    getToken: () => token,
-    getOrgId: () => organizationId,
-    credentials: 'omit',
-    autoIdempotency: false,
-    timeoutMs: 15000,
-    ...(fetcher ? { fetch: fetcher } : {}),
-  });
+  const client = createMerchantTransport(options);
   const config = { client, basePath: '', cache: 'no-store' as const };
   const products = new BaseApi<
     MerchantProduct,
@@ -73,6 +48,7 @@ export function createMerchantClient(options: MerchantClientOptions) {
   return {
     ...createMerchantAccess(client),
     ...createMerchantStock(client),
+    ...createMerchantCapabilities(client),
     ...createMerchantDelivery(client),
     products,
     collections: new BaseApi<MerchantCollection, CollectionInput, CollectionUpdate>('collections', config),
@@ -161,7 +137,7 @@ export function createMerchantClient(options: MerchantClientOptions) {
           { data },
         ),
     },
-    media: createMerchantMedia(client, fetcher),
+    media: createMerchantMedia(client, options.fetch),
   };
 }
 export type MerchantClient = ReturnType<typeof createMerchantClient>;

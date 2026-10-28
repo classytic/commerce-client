@@ -26,6 +26,7 @@ export interface StorefrontCategory {
   parentPath?: string;
   description?: string;
   image?: { url: string; alt?: string } | null;
+  bannerImage?: { url: string; alt?: string } | null;
   displayOrder?: number;
 }
 export interface StorefrontCollection {

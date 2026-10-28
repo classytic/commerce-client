@@ -18,7 +18,7 @@ export function createMerchantMedia(client: ArcClient, fetcher?: ArcClientConfig
     const response = await (fetcher ?? fetch)(target.uploadUrl, { method: 'PUT', credentials: 'omit', headers, signal: AbortSignal.timeout(60_000), body: blob });
     if (!response.ok) throw new Error('Image upload failed. Please retry.');
   }
-  async function upload(file: File, folder: 'products' | 'categories' | 'collections', processed?: CompressImageSetResult, originalFilename?: string): Promise<MerchantMedia> {
+  async function upload(file: File, folder: 'products' | 'categories' | 'collections' | 'content', processed?: CompressImageSetResult, originalFilename?: string): Promise<MerchantMedia> {
     const derivatives = processed?.derivatives ?? [];
     const started = await media.request<StartWrite>('POST', `${media.baseUrl}/start-write`, { data: {
       filename: file.name, contentType: file.type, size: file.size, folder,
@@ -43,8 +43,8 @@ export function createMerchantMedia(client: ArcClient, fetcher?: ArcClientConfig
   return {
     list: media.getAll.bind(media),
     remove: media.delete.bind(media),
-    upload: (file: File, folder: 'products' | 'categories' | 'collections' = 'products') => upload(file, folder),
-    async uploadImage(file: File, folder: 'products' | 'categories' | 'collections' = 'products'): Promise<MerchantMedia> {
+    upload: (file: File, folder: 'products' | 'categories' | 'collections' | 'content' = 'products') => upload(file, folder),
+    async uploadImage(file: File, folder: 'products' | 'categories' | 'collections' | 'content' = 'products'): Promise<MerchantMedia> {
       const policy = await media.request<MediaTransformPolicy>('GET', `${media.baseUrl}/transform-policy`);
       const { resolveTransformPlan, isTransformableImage } = await import('@classytic/media-transform/policy');
       if (!isTransformableImage(file.type)) throw new Error('Choose a JPEG, PNG, WebP, AVIF or BMP image that your browser can open.');

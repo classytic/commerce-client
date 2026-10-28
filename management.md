@@ -155,3 +155,25 @@ unshipped order restores its quantity once; shipping does not deduct again.
 Storefront products optionally expose `stock: { tracked, quantity, variants }`.
 Use a selected variant's quantity, disable sold-out options and cap the quantity
 input. These values inform the UI; checkout always validates current stock.
+
+
+Store capability settings use the captured merchant scope:
+
+```ts
+const current = await client.capabilities.read();
+await client.capabilities.update({ mode: 'products', expectedVersion: current.version });
+```
+
+Modes are `products`, `bookings`, and `both`. Offer only modes allowed by
+`current.available`; the server rejects unavailable modes and stale versions.
+Brihot currently enables Products only. A mode change affects new operations,
+not historical order access, cancellation or completed checkout replay.
+
+
+Guest salon/appointment example: `verticals/commerce-platform/examples/salon`.
+Public methods are `storefront.bookings.services()`, `.slots({ serviceId, from,
+to })`, `.create(input, { idempotencyKey })`, `.read({ id, accessToken })`, and
+`.cancel({ id, accessToken }, { idempotencyKey })`. Import DTOs from
+`@classytic/commerce-client/booking-types`. Preserve both input and key after an
+uncertain result; cancellation uses its own key. No dashboard token is needed.
+These routes are currently available only in the local Brihot booking pilot.
