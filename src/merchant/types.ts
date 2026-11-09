@@ -1,20 +1,25 @@
-import type { Money } from '@classytic/primitives/money';
-import type { Address } from '@classytic/primitives/address';
-import type { StorefrontOrder, StorefrontProduct } from './types.js';
+import type { Money } from "@classytic/primitives/money";
+import type { Address, ContactAddress } from "@classytic/primitives/address";
+import type {
+  StorefrontOrder,
+  StorefrontProduct,
+} from "../storefront/types.js";
 
 export interface ProductInput {
+  metadata?: Record<string, unknown>;
+  customSizing?: import("../storefront/types.js").CustomSizingConfig | null;
   inventory?: { stockTracked: boolean };
   name: string;
   slug: string;
-  productType: 'physical';
-  status: 'draft' | 'active' | 'archived';
+  productType: "physical";
+  status: "draft" | "active" | "archived";
   description?: string;
   categorySlug?: string;
   tags?: string[];
   collections?: string[];
-  images?: StorefrontProduct['images'];
+  images?: StorefrontProduct["images"];
   defaultMonetization: {
-    type: 'one_time';
+    type: "one_time";
     pricing: { basePrice: Money; currency: string; compareAtPrice?: Money };
   };
   variationAttributes?: Array<{
@@ -25,6 +30,8 @@ export interface ProductInput {
   variantExclusions?: Array<Record<string, string>>;
   variants?: Array<{
     /** Existing server-owned stock identity; preserve when editing a variant. */
+    imageId?: string | null;
+    customSizing?: boolean;
     skuRef?: string;
     sku: string;
     attributes: Record<string, string>;
@@ -48,7 +55,7 @@ export interface CategoryInput {
   isActive?: boolean;
   displayOrder?: number;
 }
-export type CategoryUpdate = Partial<Omit<CategoryInput, 'slug'>>;
+export type CategoryUpdate = Partial<Omit<CategoryInput, "slug">>;
 export interface MerchantCategory extends CategoryInput {
   _id: string;
   slug: string;
@@ -69,28 +76,35 @@ export interface CollectionInput {
   featured?: boolean;
   displayOrder?: number;
 }
-export type CollectionUpdate = Partial<Omit<CollectionInput, 'slug'>>;
+export type CollectionUpdate = Partial<Omit<CollectionInput, "slug">>;
 export interface MerchantCollection extends CollectionInput {
   _id: string;
   /** Pass the version read by the editor to collections.update({ version }). */
   __v: number;
   slug: string;
 }
-export interface MerchantOrder extends StorefrontOrder {
+export interface MerchantOrder extends Omit<StorefrontOrder, "paymentState"> {
   _id: string;
   customerSnapshot?: { name: string; phone?: string; email?: string };
-  shippingAddress?: Address;
+  shippingAddress?: ContactAddress;
   lines: Array<{
     lineId: string;
     quantity: number;
-    snapshot: { name?: string; sku?: string };
+    snapshot: {
+      name?: string;
+      sku?: string;
+      image?: string;
+      metadata?: {
+        customSizing?: import("../storefront/types.js").CustomSizingSnapshot;
+      };
+    };
     lineTotal?: Money;
   }>;
   paymentState?: { chargeStatus: string; totalCharged?: Money };
 }
 export type OrderCommand =
-  | { action: 'confirm' | 'start_processing' | 'ship' | 'deliver' }
-  | { action: 'cancel'; reason: string };
+  | { action: "confirm" | "start_processing" | "ship" | "deliver" }
+  | { action: "cancel"; reason: string };
 export interface StoreSettings {
   version: number | null;
   currency: string;
@@ -108,7 +122,14 @@ export interface MerchantMedia {
   mimeType?: string;
   width?: number;
   height?: number;
-  variants?: Array<{ name: string; url: string; width: number; height: number; mimeType: string; size: number }>;
+  variants?: Array<{
+    name: string;
+    url: string;
+    width: number;
+    height: number;
+    mimeType: string;
+    size: number;
+  }>;
 }
 
 export interface IntegrationProvider {
@@ -119,7 +140,7 @@ export interface IntegrationProvider {
   credentialFields: Array<{
     name: string;
     label: string;
-    type: 'text' | 'password' | 'number' | 'boolean' | 'select';
+    type: "text" | "password" | "number" | "boolean" | "select";
     required: boolean;
     secret?: boolean;
     placeholder?: string;
@@ -133,27 +154,28 @@ export interface MerchantIntegration {
   provider: string;
   label?: string;
   enabled: boolean;
-  status: 'connected' | 'disabled' | 'error';
+  status: "connected" | "disabled" | "error";
   config: Record<string, unknown>;
   secretsSet: Record<string, boolean>;
   lastTestedAt?: string | null;
-  lastTestStatus?: 'ok' | 'failed' | 'skipped';
+  lastTestStatus?: "ok" | "failed" | "skipped";
 }
 export interface NotificationDelivery {
   _id: string;
   timestamp: string;
   event: string;
-  status: 'delivered' | 'partial' | 'failed' | 'skipped';
+  channels?: string[];
+  status: "delivered" | "partial" | "failed" | "skipped";
   subject?: { sourceModel: string; sourceId: string };
 }
 export interface MerchantApiKey {
   id: string;
-  kind: 'user' | 'service';
+  kind: "user" | "service";
   name: string;
   prefix: string;
   ownerId: string;
   scopes: string[];
-  status: 'active' | 'expired' | 'revoked';
+  status: "active" | "expired" | "revoked";
   expiresAt: string | null;
   lastUsedAt: string | null;
   ceilingRole: string | null;
@@ -168,10 +190,14 @@ export interface ApiKeyOptions {
     updateService: boolean;
     deleteOthers: boolean;
   };
-  lifetime: { defaultDays: number; maxDays: number; allowNeverExpires?: boolean };
+  lifetime: {
+    defaultDays: number;
+    maxDays: number;
+    allowNeverExpires?: boolean;
+  };
 }
 export interface ApiKeyInput {
-  kind: 'user' | 'service';
+  kind: "user" | "service";
   name: string;
   scopes: string[];
   /** Null explicitly requests a key that does not expire. */
@@ -205,14 +231,18 @@ export interface MerchantOverview {
 export interface ProductStock {
   productId: string;
   tracked: boolean;
-  items: Array<{ variantSku?: string; attributes: Record<string, string>; quantity: number }>;
+  items: Array<{
+    variantSku?: string;
+    attributes: Record<string, string>;
+    quantity: number;
+  }>;
 }
 export interface StockCountInput {
   variantSku?: string;
   quantity: number;
   expectedQuantity: number;
 }
-export type StoreMode = 'products' | 'bookings' | 'both';
+export type StoreMode = "products" | "bookings" | "both";
 export interface StoreCapabilities {
   mode: StoreMode;
   available: { products: boolean; bookings: boolean };

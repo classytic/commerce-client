@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.5.0 — 2026-11-09
+
+- Require Arc Next `^0.22.0` and primitives `>=0.37.0`; update the Node engine floor.
+- Organize implementation under storefront, merchant, transport, bookings, content,
+  delivery, catalog, media and platform directories. Public import paths stay stable.
+- Add optional `/query-options` and `/storefront/query-options` entries using Arc
+  Next's identity-partitioned factories. Merchant query factories require a
+  non-secret session scope; public keys include the store.
+- Use scoped custom route invocation and explicit bearer/anonymous transport
+  policies. Public catalog fetch caching is caller-controlled; private order,
+  checkout, quote and booking reads stay uncached.
+- Validate consumer Arc Next versions and discard stale nested copies during
+  local artifact sync. Add a reproducible source formatter.
+
+- Add an optional storefront payment summary containing recorded capture/refund totals and statuses, with no payment references.
+
 ## 0.4.0 — 2026-10-29
 
 ### Booking management

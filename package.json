@@ -1,6 +1,6 @@
 {
   "name": "@classytic/commerce-client",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Typed storefront and merchant clients for the Classytic Commerce API",
   "type": "module",
   "sideEffects": false,
@@ -46,6 +46,14 @@
     "./merchant-bookings": {
       "types": "./dist/merchant-bookings.d.ts",
       "default": "./dist/merchant-bookings.js"
+    },
+    "./query-options": {
+      "types": "./dist/query-options.d.ts",
+      "default": "./dist/query-options.js"
+    },
+    "./storefront/query-options": {
+      "types": "./dist/storefront/query-options.d.ts",
+      "default": "./dist/storefront/query-options.js"
     }
   },
   "files": [
@@ -55,6 +63,7 @@
     "LICENSE",
     "management.md",
     "content.md",
+    "skills",
     "booking.md"
   ],
   "scripts": {
@@ -64,21 +73,26 @@
     "prepublishOnly": "npm run typecheck && npm test && npm run build",
     "push": "classytic-push",
     "release:tag": "node -e \"require('child_process').execSync('npm run push -- v'+require('./package.json').version,{stdio:'inherit'})\"",
-    "release": "npm run push -- main && npm run release:tag && npm publish"
+    "release": "npm run push -- main && npm run release:tag && npm publish",
+    "format": "prettier --write src tests tsdown.config.ts",
+    "format:check": "prettier --check src tests tsdown.config.ts"
   },
   "dependencies": {
-    "@classytic/arc-next": "^0.18.0",
+    "@classytic/arc-next": "^0.22.0",
     "@classytic/media-transform": "^0.3.0"
   },
   "devDependencies": {
     "@classytic/dev-tools": "^0.2.1",
-    "@types/node": "^26.6.5",
+    "@types/node": "^26.6.6",
     "esbuild": "^0.28.2",
     "publint": "^0.3.25",
-    "tsdown": "^0.23.3",
-    "typescript": "~7.0.2",
-    "vitest": "^5.0.5",
-    "@classytic/primitives": "^0.35.0"
+    "tsdown": "^0.23.7",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0",
+    "@classytic/primitives": "^0.37.0",
+    "@tanstack/react-query": "^5.107.1",
+    "react": "^19.3.1",
+    "prettier": "^3.9.10"
   },
   "publishConfig": {
     "access": "public"
@@ -93,6 +107,19 @@
   },
   "homepage": "https://github.com/classytic/commerce-client#readme",
   "peerDependencies": {
-    "@classytic/primitives": ">=0.35.0"
+    "@classytic/primitives": ">=0.37.0",
+    "@tanstack/react-query": ">=5.102.0",
+    "react": ">=19.0.0"
+  },
+  "engines": {
+    "node": "^22.22.2 || ^24.15.0 || >=26.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@tanstack/react-query": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
   }
 }

@@ -2,15 +2,14 @@ import { BaseApi } from "@classytic/arc-next/api";
 import {
   createMerchantTransport,
   type MerchantClientOptions,
-} from "./merchant-transport.js";
-import type { ProductInput } from "./management-types.js";
-import type { StorefrontBooking } from "./booking-types.js";
+} from "../transport/merchant.js";
+import type { ProductInput } from "../merchant/types.js";
+import type { StorefrontBooking } from "./types.js";
 
-export interface ServiceInput
-  extends Omit<
-    ProductInput,
-    "productType" | "inventory" | "variants" | "variationAttributes"
-  > {
+export interface ServiceInput extends Omit<
+  ProductInput,
+  "productType" | "inventory" | "variants" | "variationAttributes"
+> {
   productType: "service";
   inventory: { stockTracked: false };
   shipping: { requiresShipping: false };
@@ -94,11 +93,11 @@ export function createMerchantBookingsClient(options: MerchantClientOptions) {
         schedule: ResourceSchedule,
         expectedVersion: number,
       ) =>
-        resources.request<BookableResource>(
-          "POST",
-          `${resources.baseUrl}/${resourceId(id)}/action`,
-          { data: { action: "set_schedule", ...schedule, expectedVersion } },
-        ),
+        resources.invokeRoute<BookableResource>({
+          method: "POST",
+          path: `/${resourceId(id)}/action`,
+          data: { action: "set_schedule", ...schedule, expectedVersion },
+        }),
     }),
     bookings: Object.assign(bookings, {
       action: (
@@ -115,14 +114,12 @@ export function createMerchantBookingsClient(options: MerchantClientOptions) {
           throw new Error(
             "Preserve a booking operation idempotency key for retries.",
           );
-        return bookings.request<MerchantBooking>(
-          "POST",
-          `${bookings.baseUrl}/${resourceId(id)}/action`,
-          {
-            data: { action },
-            options: { headerOptions: { "Idempotency-Key": idempotencyKey } },
-          },
-        );
+        return bookings.invokeRoute<MerchantBooking>({
+          method: "POST",
+          path: `/${resourceId(id)}/action`,
+          data: { action },
+          options: { headerOptions: { "Idempotency-Key": idempotencyKey } },
+        });
       },
     }),
   };

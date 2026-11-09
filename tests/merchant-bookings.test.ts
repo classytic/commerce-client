@@ -1,5 +1,5 @@
 import { expect, it, vi } from "vitest";
-import { createMerchantBookingsClient } from "../src/merchant-bookings.js";
+import { createMerchantBookingsClient } from "../src/bookings/merchant.js";
 it("scopes merchant service, schedule and lifecycle requests to the captured store", async () => {
   const fetch = vi.fn(async (_url: string, _init: RequestInit) =>
     Response.json({ data: [], hasNext: false }),

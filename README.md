@@ -8,7 +8,7 @@ a different contract.
 Install with `npm install @classytic/commerce-client`.
 The client shares the app’s `@classytic/primitives >=0.35.0` peer for Money types.
 
-Use Arc Next 0.18 or later. This entry uses its server-safe client/API subpaths;
+Use Arc Next 0.22 or later and Node `^22.22.2 || ^24.15.0 || >=26`. This entry uses its server-safe client/API subpaths;
 it imports no React hooks, Next.js APIs, merchant credentials or server kernels.
 
 ```ts
@@ -182,4 +182,28 @@ Use the separate [`/content` entry](content.md) for published storefront section
 and scoped merchant editing. Drafts, publishing and trusted templates require the
 optional CMS module in the API.
 
+For an AI coding agent, use the packaged
+[CMS integration skill](skills/commerce-content/SKILL.md). It covers page loading,
+IDs, tenant scoping and request reuse. Copy its folder into your agent's skills
+directory, or give the agent that file together with `content.md`.
+
 Optional booking management and storefront examples: [booking guide](booking.md).
+
+## Public query options and source layout
+
+`createStorefrontQueries({ apiUrl, store })` from
+`@classytic/commerce-client/storefront/query-options` supplies public `products()`
+and `product(slug)` query options. These read anonymously and partition cache keys
+by store. Private guest-order access stays outside this shared public cache.
+Catalog reads do not force a fetch cache mode; configure server caching under the
+host framework's rules. Checkout, quotes, order status and booking availability
+remain uncached.
+
+Source files live by feature: `src/storefront`, `src/merchant`, `src/transport`,
+`src/bookings`, `src/content`, `src/delivery`, `src/catalog`, `src/media`,
+`src/platform` and `src/query`. `tsdown.config.ts` maps public entries directly to
+those modules; do not add forwarding files at the source root. Merchant client
+composition delegates to feature factories. `npm run format:check`,
+`npm run typecheck`, `npm test` and `npm run build` validate changes. For local
+consumer development, build first and run `npm run dev:sync` from the app; the sync
+script checks dependency identities and copied artifact hashes.

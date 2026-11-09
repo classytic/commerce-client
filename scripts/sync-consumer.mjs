@@ -22,6 +22,10 @@ const testedPrimitives = JSON.parse(await readFile(resolve(source, 'node_modules
 const appPrimitives = JSON.parse(await readFile(resolve(app, 'node_modules/@classytic/primitives/package.json'), 'utf8'));
 if (appPrimitives.version !== testedPrimitives.version)
   throw new Error(`Install @classytic/primitives@${testedPrimitives.version} in this consumer before syncing the SDK.`);
+const testedArc = JSON.parse(await readFile(resolve(source, 'node_modules/@classytic/arc-next/package.json'), 'utf8'));
+const appArc = JSON.parse(await readFile(resolve(app, 'node_modules/@classytic/arc-next/package.json'), 'utf8'));
+if (appArc.version !== testedArc.version)
+  throw new Error(`Install @classytic/arc-next@${testedArc.version} in this consumer before syncing the SDK.`);
 
 async function files(path) {
   const entries = await readdir(path, { withFileTypes: true });
@@ -47,6 +51,7 @@ const latest = async (paths) =>
 if ((await latest(sourceFiles)) > (await latest(builtFiles)))
   throw new Error('SDK dist is older than source; rebuild first.');
 await rm(resolve(consumer, 'node_modules/@classytic/primitives'), { recursive: true, force: true });
+await rm(resolve(consumer, 'node_modules/@classytic/arc-next'), { recursive: true, force: true });
 await rm(resolve(consumer, 'dist'), { recursive: true, force: true });
 await cp(resolve(source, 'dist'), resolve(consumer, 'dist'), {
   recursive: true,

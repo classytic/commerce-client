@@ -1,8 +1,36 @@
 # Merchant client
 
+## Query factories (optional)
+
+```ts
+import { createMerchantClient } from '@classytic/commerce-client/management';
+import { createMerchantQueries } from '@classytic/commerce-client/query-options';
+
+const merchant = createMerchantClient({ apiUrl, token, organizationId });
+const queries = createMerchantQueries(merchant, session.id); // never use the token as a cache key
+const options = queries.products.list({ page: 1, limit: 20 });
+// useQuery(options), useSuspenseQuery(options), or queryClient.query(options)
+// useMutation(queries.collections.update()) uses Arc Next's write invalidation.
+```
+
+Factories expose products, categories, collections and orders; `createContentQueries`
+does the same for a merchant content client. Arc Next owns query keys, tenant
+partitions, abort forwarding and CRUD mutation invalidation. Create the client per
+authenticated store and use a non-secret session ID as its cache scope. Clear
+private caches on sign-out; never share a server QueryClient across requests.
+Custom actions and stock counts still require their explicit idempotency keys.
+The ordinary SDK entry points do not import TanStack Query or React at runtime.
+
 Import `createMerchantClient` from `@classytic/commerce-client/management`.
 Its contracts live in `/management/types`. The guest-only root entry imports
 none of this authenticated surface.
+
+Notification delivery records expose `channels` alongside their status. A provider
+accepting a message is recorded as sent; it is not evidence that the receiver read
+it. Store email connections use `service: 'email'`, `provider: 'managed-email'` and
+`credentials: { recipientEmail }` when that provider is advertised by the API's
+integration catalog. The platform owns SMTP credentials. Do not request an email
+password from the store owner or assume the provider is enabled in every host.
 
 ```ts
 import { createMerchantClient } from '@classytic/commerce-client/management';
@@ -177,3 +205,16 @@ to })`, `.create(input, { idempotencyKey })`, `.read({ id, accessToken })`, and
 `@classytic/commerce-client/booking-types`. Preserve both input and key after an
 uncertain result; cancellation uses its own key. No dashboard token is needed.
 These routes are currently available only in the local Brihot booking pilot.
+
+
+### Custom sizing
+
+Set `product.customSizing` to `{ unit: 'in' | 'cm', fields: [{ code, label, required, min, max }] }` and mark the relevant `variants[].customSizing: true`. A custom-size variant uses its normal `priceModifier`; the browser never supplies a surcharge. Set the product configuration to `null` and clear variant flags to disable it.
+
+Storefront quote and checkout lines accept `customSizing: { measurements: { chest: 12.5 }, note?: string }`. The catalog validates the selected variant and the configured fields. Persisted order lines expose `snapshot.metadata.customSizing` with trusted labels, units and values. Include measurements and notes in the cart-line identity so different requests do not merge. Preserve them with the checkout idempotency key when retrying.
+
+### Variant image references
+
+`images[].id` identifies an attachment within the product. Set a variant's optional `imageId` to one of those IDs, or `null` to use the product cover. Assign IDs before a single create request if it also contains variant image selections; otherwise Catalog assigns missing IDs and returns them. Preserve IDs when editing URLs, alt text or image order. Multiple variants can share one attachment.
+
+The write boundary rejects IDs outside the product and duplicate attachment IDs. Removing a product image clears its variant assignments. No file upload is performed by assigning an image; media storage and deletion stay with the existing media library. Existing images without IDs receive them on the next product write.
